@@ -2,6 +2,10 @@ package com.makotojava.learn.hellojunit5;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.beans.Transient;
+
+import javax.management.DescriptorKey;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,26 +31,45 @@ import org.slf4j.LoggerFactory;
  * </ol>
  *
  */
+@RunWith(JUnitPlatform.class)
+@DisplayName("JUnit Testing")
+
 public class JUnit5AppTest {
 
   // Create a JDK Logger here
-
+  private static final java.util.logging.Logger logger = LoggerFactory.getLogger(JUnit5AppTest.class);
   // Create a fixture for the class under test
-
+  private App testingApp;
   // Do something before ANY test is run in this class
+  @BeforeAll
   public static void init() {
+    logger.info("@BeforeAll: init()");
   }
 
   // Do something after ALL tests in this class are run
+  @AfterAll
   public static void done() {
+    logger.info("@AfterAll: done()");
   }
 
   // Create an instance of the test class before each @Test method is executed
-
+  @BeforeEach
+  public void instance() {
+    logger.info("@BeforeEach: instance()");
+    testingApp = new App();
+  }
   // Destroy reference to the instance of the test class after each @Test method is executed
-
+  @AfterEach
+  public void destroy() {
+    logger.info("@AfterEach: destroy()");
+    testingApp = null;
+  }
   // Disabled test
+  @Test
+  @Disabled
+  @DisplayName("Disabled test")
   void testNotRun() {
+    logger.info("Disabled test");
   }
 
   /**
@@ -66,12 +89,35 @@ public class JUnit5AppTest {
    * {@link org.junit.jupiter.api.Assertions#assertAll(org.junit.jupiter.api.function.Executable...) assertAll()}
    * </ol>
    */
+  @Test
+  @DisplayName("Add test")
   public void testAdd() {
     //
     // EXERCISE: TODO: ADD CODE HERE (See Javadoc comments for instructions. Use the Javadoc View in Eclipse to see the
     // buttery smooth javadoc above.)
     //
-    fail("Test not implemented!");
+    logger.info("@Test: testAdd()");
+    assertNotNull(testingApp);
+    assertAll(
+      () -> {
+        long[] numberList = {1,2,3,4};
+        long expectedAnswer = 10;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }, 
+      () -> {
+        long[] numberList = {20,934,110};
+        long expectedAnswer = 1064;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }, 
+      () -> {
+        long[] numberList = {2,4,6};
+        long expectedAnswer = 12;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }
+    );
   }
 
   /**
@@ -92,8 +138,16 @@ public class JUnit5AppTest {
    * </ol>
    * 
    */
+  @Nested
+  @DisplayName("Negative addition test")
   class NegativeNumbersTest {
-
+    private App classUnderTest;
+    @BeforeEach void setUp() throws Exception {
+      classUnderTest = new App();
+    }
+    @AfterEach void tearDown() throws Exception {
+      classUnderTest = null;
+    }
     /**
      * testAdd() - Exercises:
      * <ol>
@@ -112,12 +166,34 @@ public class JUnit5AppTest {
      * {@link org.junit.jupiter.api.Assertions#assertAll(org.junit.jupiter.api.function.Executable...) assertAll()}
      * </ol>
      */
+    @Test
+    @DisplayName("Adding negative numbers")
     public void testAdd() {
       //
       // EXERCISE: TODO: ADD CODE HERE (See Javadoc comments for instructions. Use the Javadoc View in Eclipse to see
       // the buttery smooth javadoc above.)
       //
-      fail("Test not implemented!");
+      assertNotNull(classUnderTest);
+      assertAll(
+      () -> {
+        long[] numberList = {-1,-2,-3,-4};
+        long expectedAnswer = -10;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }, 
+      () -> {
+        long[] numberList = {-20,-934,-110};
+        long expectedAnswer = -1064;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }, 
+      () -> {
+        long[] numberList = {-2,-4,-6};
+        long expectedAnswer = -12;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }
+    );
     }
   }
 
@@ -130,6 +206,8 @@ public class JUnit5AppTest {
    * </ol>
    * 
    */
+  @Nested
+  @DisplayName("Adding both negative and positive numbers")
   class PositiveAndNegativeNumbersTest {
 
     /**
@@ -150,12 +228,33 @@ public class JUnit5AppTest {
      * {@link org.junit.jupiter.api.Assertions#assertAll(org.junit.jupiter.api.function.Executable...) assertAll()}
      * </ol>
      */
+    @Test
+    @DisplayName("Testing add method with both negative and positive numbers")
     public void testAdd() {
       //
       // EXERCISE: TODO: ADD CODE HERE (See Javadoc comments for instructions. Use the Javadoc View in Eclipse to see
       // the buttery smooth javadoc above.)
       //
-      fail("Test not implemented!");
+      assertAll(
+      () -> {
+        long[] numberList = {-1,2,-3,4};
+        long expectedAnswer = 2;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }, 
+      () -> {
+        long[] numberList = {-20,934,-110};
+        long expectedAnswer = 804;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }, 
+      () -> {
+        long[] numberList = {-2,-4,6};
+        long expectedAnswer = 0;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }
+    );
     }
 
     /**
@@ -171,12 +270,20 @@ public class JUnit5AppTest {
      * <li>Ensure the actual sum matches the expected sum.</li>
      * </ol>
      */
+    @Test
+    @DisplayName("Only works on Fridays")
     public void testAdd_OnlyOnFriday() {
       //
       // EXERCISE: TODO: ADD CODE HERE (See Javadoc comments for instructions. Use the Javadoc View in Eclipse to see
       // the buttery smooth javadoc above.)
       //
-      fail("Test not implemented!");
+      assertNotNull(testingApp);
+      LocalDateTime friday = LocalDateTime.now();
+      assumeTrue(friday.getDayOfWeek().getValue() == 5);
+      long[] numberList = { 1, 2, 3, 4, 5 };
+      long expectedAnswer = 15;
+      long actualAnswer = testingApp.add(numberList);
+      assertEquals(expectedAnswer, actualAnswer);
     }
 
     /**
@@ -193,12 +300,22 @@ public class JUnit5AppTest {
      * <li>Ensure the actual sum matches the expected sum.</li>
      * </ol>
      */
+    @Test
+    @DisplayName("Same as Only on Friday test but with Lamda")
     public void testAdd_OnlyOnFriday_WithLambda() {
       //
       // EXERCISE: TODO: ADD CODE HERE (See Javadoc comments for instructions. Use the Javadoc View in Eclipse to see
       // the buttery smooth javadoc above.)
       //
-      fail("Test not implemented!");
+      assertNotNull(testingApp);
+      LocalDateTime friday = LocalDateTime.now();
+      assumingThat(friday.getDayOfWeek().getValue() == 5,
+        () -> {
+          long[] numberList = { 1, 2, 3, 4, 5 };
+          long expectedAnswer = 15;
+          long actualAnswer = testingApp.add(numberList);
+          assertEquals(expectedAnswer, actualAnswer);
+        });
     }
 
   }
@@ -212,6 +329,8 @@ public class JUnit5AppTest {
    * </ol>
    * 
    */
+  @Nested
+  @DisplayName("Single add test")
   class JUnit5AppSingleOperandTest {
 
     /**
@@ -231,12 +350,27 @@ public class JUnit5AppTest {
      * {@link org.junit.jupiter.api.Assertions#assertAll(org.junit.jupiter.api.function.Executable...) assertAll()}
      * </ol>
      */
+    @Test
+    @DisplayName("Single numbers")
     public void testAdd_NumbersGt0() {
       //
       // EXERCISE: TODO: ADD CODE HERE (See Javadoc comments for instructions. Use the Javadoc View in Eclipse to see
       // the buttery smooth javadoc above.)
       //
-      fail("Test not implemented!");
+      assertNotNull(testingApp);
+      assertAll(
+      () -> {
+        long[] numberList = {1};
+        long expectedAnswer = 1;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }, 
+      () -> {
+        long[] numberList = {0};
+        long expectedAnswer = 0;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      });
     }
 
     /**
@@ -256,12 +390,27 @@ public class JUnit5AppTest {
      * {@link org.junit.jupiter.api.Assertions#assertAll(org.junit.jupiter.api.function.Executable...) assertAll()}
      * </ol>
      */
+    @Test
+    @DisplayName("Sinlge negative numbers")
     public void testAdd_NumbersLt0() {
       //
       // EXERCISE: TODO: ADD CODE HERE (See Javadoc comments for instructions. Use the Javadoc View in Eclipse to see
       // the buttery smooth javadoc above.)
       //
-      fail("Test not implemented!");
+      assertNotNull(testingApp);
+      assertAll(
+      () -> {
+        long[] numberList = {-1};
+        long expectedAnswer = -1;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      }, 
+      () -> {
+        long[] numberList = {-10};
+        long expectedAnswer = -10;
+        long actualAnswer = testingApp.add(numberList);
+        assertEquals(expectedAnswer, actualAnswer);
+      });
     }
   }
 
@@ -274,6 +423,8 @@ public class JUnit5AppTest {
    * </ol>
    * 
    */
+  @Nested
+  @DisplayName("Testing for no numbers")
   class JUnit5AppZeroOperandsTest {
 
     /**
@@ -289,12 +440,16 @@ public class JUnit5AppTest {
      * assertThrows()} method).</li>
      * </ol>
      */
+    @Test
+    @DisplayName("Empty list")
     public void testAdd_ZeroOperands_EmptyArgument() {
       //
       // EXERCISE: TODO: ADD CODE HERE (See Javadoc comments for instructions. Use the Javadoc View in Eclipse to see
       // the buttery smooth javadoc above.)
       //
-      fail("Test not implemented!");
+      assertNotNull(testingApp);
+      long[] noNumbers = {};
+      assertThrows(IllegalArgumentException.class, () -> testingApp.add(noNumbers));
     }
 
     /**
@@ -311,12 +466,17 @@ public class JUnit5AppTest {
      * <li>The test should fail if the message in the exception is not "Operands argument cannot be null".</li>
      * </ol>
      */
+    @Test
+    @DisplayName("Null list")
     public void testAdd_ZeroOperands_NullArgument() {
       //
       // EXERCISE: TODO: ADD CODE HERE (See Javadoc comments for instructions. Use the Javadoc View in Eclipse to see
       // the buttery smooth javadoc above.)
       //
-      fail("Test not implemented!");
+      assertNotNull(testingApp);
+      long[] noNumbers = null;
+      Throwable exceptionMessage = assertThrows(IllegalArgumentException.class, () -> testingApp.add(noNumbers));
+      assertEquals("Operands argument cannot be null", exceptionMessage.getLocalizedMessage());
     }
 
   }
